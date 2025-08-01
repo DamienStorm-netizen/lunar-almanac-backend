@@ -1,0 +1,510 @@
+{
+    "months": [
+        {
+            "name": "Mirabilis",
+            "start_date": "2024-12-22",
+            "end_date": "2024-12-22",
+            "tagline": "Beyond the boundary of time, in the hush between cycles, Mirabilis blooms. Here, two sacred breaths—one of fire, one of shadow—meet where neither past nor future holds sway."
+        },
+        {
+            "name": "Nivis",
+            "start_date": "2024-12-23",
+            "end_date": "2025-01-19",
+            "tagline": "From the Latin ‘nix’ meaning snow, Nivis is the breath of winter’s hush, a month where frost writes poetry upon the earth and silence speaks in crystalline whispers."
+        },
+        {
+            "name": "Janus",
+            "start_date": "2025-01-20",
+            "end_date": "2025-02-16",
+            "tagline": "Named for the two-faced Roman god of doorways and transitions, Janus stands at the threshold of past and future, where winds of change stir the soul."
+        },
+        {
+            "name": "Brigid",
+            "start_date": "2025-02-17",
+            "end_date": "2025-03-16",
+            "tagline": "Named for the Celtic goddess of poetry, hearth, and forge, Brigid is the sacred fire of renewal and inspiration, where winter’s chill yields to the first flickers of spring."
+        },
+        {
+            "name": "Flora",
+            "start_date": "2025-03-17",
+            "end_date": "2025-04-13",
+            "tagline": "A tribute to the Roman goddess of blooming flowers and spring’s gentle embrace, Flora is the time when earth awakens in colour, a festival of fragrant renewal."
+        },
+        {
+            "name": "Maia",
+            "start_date": "2025-04-14",
+            "end_date": "2025-05-11",
+            "tagline": "Named for the nurturing Roman goddess of growth, Maia embodies the ripening warmth of spring, her name echoing ‘maius’—greater, larger, the promise of abundance."
+        },
+        {
+            "name": "Juno",
+            "start_date": "2025-05-12",
+            "end_date": "2025-06-08",
+            "tagline": "Honouring the Roman goddess of love and sovereignty, Juno is a month of passion and protection, where devotion burns bright and the sacred feminine reigns supreme."
+        },
+        {
+            "name": "Solis",
+            "start_date": "2025-06-09",
+            "end_date": "2025-07-06",
+            "tagline": "From the Latin ‘sol’ meaning sun, Solis is the golden hour of the year, when the sun stands proud at its peak, bestowing light, life, and radiant joy."
+        },
+        {
+            "name": "Terra",
+            "start_date": "2025-07-07",
+            "end_date": "2025-08-03",
+            "tagline": "Honouring the Roman goddess of the Earth, Terra is a celebration of fertile lands and fruitful harvests, where nature’s generosity spills forth in green abundance."
+        },
+        {
+            "name": "Lugh",
+            "start_date": "2025-08-04",
+            "end_date": "2025-08-31",
+            "tagline": "Named for the Celtic god of light, skill, and craftsmanship, Lugh is a forge of inspiration, where wisdom and fire unite to shape the fate of heroes."
+        },
+        {
+            "name": "Pomona",
+            "start_date": "2025-09-01",
+            "end_date": "2025-09-28",
+            "tagline": "A tribute to the Roman goddess of orchards and fruitfulness, Pomona is a season of rich harvests and whispered abundance, where the earth gifts its sweetest treasures."
+        },
+        {
+            "name": "Autumna",
+            "start_date": "2025-09-29",
+            "end_date": "2025-10-26",
+            "tagline": "From the Latin ‘autumnus’ meaning the fall, Autumna is the golden descent of the year, where leaves turn to fire and the air hums with the poetry of endings."
+        },
+        {
+            "name": "Eira",
+            "start_date": "2025-10-27",
+            "end_date": "2025-11-23",
+            "tagline": "From the Old Norse ‘eyrr’ and Welsh ‘eira’ meaning snow, Eira is the quiet descent of winter’s veil, where frost-kissed dreams whisper of endings and renewal."
+        },
+        {
+            "name": "Aether",
+            "start_date": "2025-11-24",
+            "end_date": "2025-12-21",
+            "tagline": "The celestial breath between earth and sky, Aether is the unseen force of existence, where stardust and spirit intertwine in the spaces between worlds."
+        }
+    ],
+    "special_days": [
+        {
+            "name": "Imbolc",
+            "description": "Imbolc marks the first signs of spring. It's a time to celebrate the return of life and the arrival of new growth.",
+            "poem": "Imbolc’s fire, a guiding light,\nTo cleanse the old and spark the bright.\nSweep the hearth and set your aim,\nBegin anew in Brigid’s name.",
+            "date": "2025-02-01",
+            "linked_phase": "Full Moon",
+            "linked_moon": "Snow Moon",
+            "url": "https://playgroundofthesenses.substack.com/p/imbolc-the-first-flame-and-sacred"
+        },
+        {
+            "name": "Ostara",
+            "description": "Ostara marks the spring equinox. It's a time to celebrate the balance of light and dark and to look ahead to the growth and renewal of spring.",
+            "poem": "Ostara greets the dawn’s bright glow,\nAs light and dark share equal show.\nPlant a seed and watch it grow,\nSpring awakens, soft and slow.",
+            "date": "2025-03-20",
+            "linked_phase": "Full Moon",
+            "linked_moon": "Worm Moon",
+            "url": "https://playgroundofthesenses.substack.com/p/ostara-the-balance-of-blossoms-and"
+        },
+        {
+            "name": "Beltane",
+            "description": "Beltane marks the beginning of summer. It's a time to celebrate the fertility of the earth and the arrival of new life.",
+            "poem": "Beltane fires in moonlit glade,\nMark love’s embrace and life displayed.\nDance with joy ‘neath skies so wide,\nAnd weave the threads where dreams reside.",
+            "date": "2025-05-01",
+            "linked_phase": "Full Moon",
+            "linked_moon": "Flower Moon",
+            "url": "https://playgroundofthesenses.substack.com/p/beltane-the-fire-of-union-and-fertile"
+        },
+        {
+            "name": "Litha",
+            "description": "Litha marks the summer solstice. It's a time to celebrate the power of the sun and the longest day of the year.",
+            "poem": "The sun at peak, its golden flame,\nOn Litha’s day, no dark can claim.\nBathe in light, embrace its glow,\nAnd let your inner fire grow.",
+            "date": "2025-06-21",
+            "linked_phase": "Full Moon",
+            "linked_moon": "Strawberry Moon",
+            "url": "https://playgroundofthesenses.substack.com/p/litha-the-crown-of-light-and-sovereign"
+        },
+        {
+            "name": "Lughnasadh",
+            "description": "Lughnasadh marks the beginning of the harvest season. It's a time to give thanks for the abundance of the earth and to prepare for the coming winter.",
+            "poem": "Lughnasadh fields of amber grain,\nGive thanks for sun and summer rain.\nShare your bread, your heart, your care,\nAnd bless the earth with all you bear.",
+            "date": "2025-08-01",
+            "linked_phase": "Full Moon",
+            "linked_moon": "Grain Moon",
+            "url": "https://playgroundofthesenses.substack.com/p/lughnasadh-the-golden-harvest-and"
+        },
+        {
+            "name": "Mabon",
+            "description": "Mabon marks the autumn equinox. It's a time to celebrate the balance of light and dark and to look ahead to the chill of winter.",
+            "poem": "Mabon’s time, the scales now sway,\nEqual hours of night and day.\nGather fruits and share the feast,\nCelebrate the earth’s increase.",
+            "date": "2025-09-22",
+            "linked_phase": "Full Moon",
+            "linked_moon": "Harvest Moon",
+            "url": "https://playgroundofthesenses.substack.com/p/mabon-the-balance-of-shadow-and-abundance"
+        },
+        {
+            "name": "Samhain",
+            "description": "This festival marks the end of the harvest season. It's a time to reflect on the past year and honour the ancestors who have come before us.",
+            "poem": "The veil grows thin on Samhain night,\nA time for dreams and spirit’s sight.\nLight a flame for those once near,\nAnd seek their wisdom, calm and clear.",
+            "date": "2025-10-31",
+            "linked_phase": "Full Moon",
+            "linked_moon": "Hunter's Moon"
+        },
+        {
+            "name": "Yule",
+            "description": "Yule marks the winter solstice. It's a time to celebrate the return of the light and the rebirth of the sun.",
+            "poem": "Yule’s bright star in longest night,\nBrings hope of dawn and coming light.\nExchange your gifts, sing songs of cheer,\nThe wheel has turned; new life draws near.",
+            "date": "2025-12-21",
+            "linked_phase": "Full Moon",
+            "linked_moon": "Cold Moon"
+        },
+        {
+            "name": "Mirabilis",
+            "description": "Mirabilis is a breath held between endings and beginnings—a sacred pause where the wheel stands still. Neither dark nor light, it is the hush between heartbeats, the silence where soul meets sky.",
+            "poem": "Between the dusk and coming light,\nMirabilis blooms in velvet night.\nNo path to walk, no time to chase,\nJust stars and stillness, vast in space.",
+            "date": "2025-12-22",
+            "linked_phase": "Waning Gibbous",
+            "linked_moon": "Cold Moon"
+        }
+    ],
+    "national_holidays": [
+        {
+            "title": "New Year's Day",
+            "type": "USA",
+            "date": "2025-01-01",
+            "description": "A turning of the cosmic wheel, where time is reborn in shimmering hope and stardust wishes."
+        },
+        {
+            "title": "Martin Luther King Jr. Day",
+            "type": "USA",
+            "date": "2025-01-20",
+            "description": "A day of dreaming bold and rising strong, when voices echo like thunder for justice and peace."
+        },
+        {
+            "title": "Valentine's Day",
+            "type": "USA",
+            "date": "2025-02-14",
+            "description": "A heart-shaped spell cast upon the world, where love blooms and passion lingers like rose perfume."
+        },
+        {
+            "title": "Presidents’ Day",
+            "type": "USA",
+            "date": "2025-02-17",
+            "description": "A reflection on those who shaped the nation's fate—through storms and stillness, with quill and courage."
+        },
+        {
+            "title": "St. Patrick's Day",
+            "type": "USA",
+            "date": "2025-03-17",
+            "description": "Emerald echoes and laughter rise—today the fae walk among us, cloaked in clover and mirth."
+        },
+        {
+            "title": "Memorial Day",
+            "type": "USA",
+            "date": "2025-05-26",
+            "description": "A solemn flame flickers for the fallen—where silence speaks of sacrifice and honour rides the breeze."
+        },
+        {
+            "title": "Mother's Day",
+            "type": "USA",
+            "date": "2025-05-11",
+            "description": "A day wrapped in the soft glow of nurturing spirits, where love flows from root to bloom."
+        },
+        {
+            "title": "Father's Day",
+            "type": "USA",
+            "date": "2025-06-15",
+            "description": "A tribute to guiding stars—strong, steady, and luminous as ancient oaks in summer’s sun."
+        },
+        {
+            "title": "Juneteenth",
+            "type": "USA",
+            "date": "2025-06-19",
+            "description": "Chains shattered, spirits freed—Juneteenth rings with ancestral triumph and the fire of freedom."
+        },
+        {
+            "title": "Independence Day",
+            "type": "USA",
+            "date": "2025-07-04",
+            "description": "Fireworks bloom like celestial flowers in celebration of liberty’s blazing star."
+        },
+        {
+            "title": "Labor Day",
+            "type": "USA",
+            "date": "2025-09-01",
+            "description": "A sacred pause where hands rest and hearts honour the quiet nobility of work."
+        },
+        {
+            "title": "Columbus Day",
+            "type": "USA",
+            "date": "2025-10-13",
+            "description": "Voyages remembered beneath a questioning sky—echoes of discovery and reckoning alike."
+        },
+        {
+            "title": "Veterans Day",
+            "type": "USA",
+            "date": "2025-11-11",
+            "description": "Honour walks among us, cloaked in silence and strength—today we remember the keepers of peace."
+        },
+        {
+            "title": "Thanksgiving Day",
+            "type": "USA",
+            "date": "2025-11-27",
+            "description": "A harvest of gratitude, where hearths glow with remembrance and blessings flow like mead."
+        },
+        {
+            "title": "Christmas Day",
+            "type": "USA",
+            "date": "2025-12-25",
+            "description": "A holy hush cloaks the world in wonder, where light returns through stories, stars, and song."
+        }
+    ],
+    "custom_events": [
+        {
+            "id": "1711742214032",
+            "title": "Hello World, BabySweet",
+            "type": "💜 Romantic",
+            "date": "2025-05-02",
+            "notes": "Baby is the best!!"
+        },
+        {
+            "id": "1744328456472",
+            "title": "Hello World, Baby Baby!",
+            "type": "🔥 Date",
+            "date": "2025-04-12",
+            "notes": "You took too much, too much...."
+        },
+        {
+            "id": "1746485879844",
+            "title": "Hello World, Baby Princess",
+            "type": "🔥 Date",
+            "notes": "Date test!",
+            "date": "2025-05-06"
+        },
+        {
+            "id": "1746575894446",
+            "title": "Ride Baby Ride!",
+            "type": "🎉 Celebrations",
+            "notes": "I'm so excited! 🏍️",
+            "date": "2025-07-16",
+            "recurring": false
+        }
+    ],
+    "full_moons": [
+        {
+            "name": "Wolf Moon",
+            "date": "2025-01-13",
+            "description": "Named after the howling of hungry wolves in midwinter, this moon symbolises strength and survival in the coldest time of the year.",
+            "poem": "In the silent woods, a silver howl rides the wind—\nThe Wolf Moon rises, fierce and kind.\nThrough frost and shadow, her courage glows,\nA guardian spirit where wildness grows."
+        },
+        {
+            "name": "Snow Moon",
+            "date": "2025-02-12",
+            "description": "Reflecting the heavy snowfall of late winter, the Snow Moon represents the purity and quiet beauty of the season.",
+            "poem": "Under veils of white, the world lies hushed—\nSnow Moon sings in crystal blush.\nHer light drifts down in frozen lace,\nA gentle spell of silent grace."
+        },
+        {
+            "name": "Worm Moon",
+            "date": "2025-03-14",
+            "description": "Named for the thawing ground and the return of worms, this moon signals the rebirth of the soil as spring approaches.",
+            "poem": "Earth stirs beneath the Worm Moon’s gaze,\nRoots awaken, breaking haze.\nLife returns in subtle tune—\nA promise sown beneath the moon."
+        },
+       {
+            "name": "Pink Moon",
+            "date": "2025-04-13",
+            "description": "Named for the blooming pink phlox that herald early spring, this moon celebrates renewal and the first flush of colour after winter.",
+            "poem": "Beneath soft petals, the Pink Moon glows,\nAwakening earth where new life grows.\nIn twilight’s blush, hopes intertwine—\nSpring’s tender promise, pure and fine."
+        },
+        {
+            "name": "Flower Moon",
+            "date": "2025-05-11",
+            "description": "Named for the abundance of blooming flowers, this moon symbolises growth and beauty in full swing.",
+            "poem": "Blossoms bow to the Flower Moon’s delight,\nPetals unfurl in fragrant night.\nBeauty blooms in every glade—\nA tapestry by moonlight made."
+        },
+        {
+            "name": "Strawberry Moon",
+            "date": "2025-06-10",
+            "description": "A tribute to the ripening of strawberries, this moon marks the sweet beginning of summer.",
+            "poem": "Strawberry Moon in roseate hue,\nRipens fruit and dreams anew.\nSweetness lingers in the air—\nA taste of summer everywhere."
+        },
+        {
+            "name": "Thunder Moon",
+            "date": "2025-07-09",
+            "description": "Named for the thunderstorms that mark the beginning of summer, this moon symbolises the power of nature to bring about change.",
+            "poem": "Thunder Moon beats in fervent drums,\nStorm‑lit skies where power hums.\nRainfall cleanses, lightning sings,\nChange rides bold on summer wings."
+        },
+        {
+            "name": "Grain Moon",
+            "date": "2025-08-07",
+            "description": "Reflecting the ripening fields of grain, this moon celebrates abundance and gratitude for the first harvest. Also known as Sturgeon Moon.",
+            "poem": "Amber seas beneath the Grain Moon’s light,\nHarvest songs fill up the night.\nGratitude for fields grown gold—\nStories of abundance told."
+        },
+        {
+            "name": "Harvest Moon",
+            "date": "2025-09-06",
+            "description": "The full moon closest to the autumn equinox, the Harvest Moon lights the way for farmers gathering crops late into the night.",
+            "poem": "Harvest Moon climbs, bold and bright,\nGuiding hands through autumn’s night.\nBeneath her glow the fields are blessed—\nEarth’s generosity confessed."
+        },
+        {
+            "name": "Hunter's Moon",
+            "date": "2025-10-05",
+            "description": "Traditionally aiding hunters in tracking game, this moon symbolises preparation and sustenance.",
+            "poem": "Hunter’s Moon, a lantern high,\nTracks the quarry through the sky.\nPreparation, skill, and lore—\nWinter’s promise at the door."
+        },
+        {
+            "name": "Frost Moon",
+            "date": "2025-11-04",
+            "description": "Named for the first frost of the season, this moon marks the transition to winter’s stillness. Also known as Beaver Moon.",
+            "poem": "Frost Moon weaves a silver thread,\nBlankets earth where dreams are spread.\nStillness settles, cold and deep—\nThe world prepares for winter’s sleep."
+        },
+        {
+            "name": "Cold Moon",
+            "date": "2025-12-04",
+            "description": "Reflecting the chill of winter’s embrace, this moon represents endurance and reflection.",
+            "poem": "Cold Moon reigns in icy blue,\nEndurance shines in all we do.\nReflection calls through darkest night—\nAwait the sun’s returning light."
+        }
+    ],
+    "zodiac": [
+        {
+            "name": "Birch",
+            "start_date": "2024-12-24",
+            "end_date": "2025-01-20",
+            "celtic_date": "Nivis 2 to Janus 1",
+            "symbolism": "New beginnings, purification, and renewal.",
+            "animal": "White Stag - Guidance and intuition.",
+            "mythical_creature": "White Hart - Purity, power, and nobility.",
+            "element": "🌬️ Air",
+            "url": "https://playgroundofthesenses.substack.com/p/birch-the-dawn-of-beginnings-and"
+        },
+        {
+            "name": "Rowan",
+            "start_date": "2025-01-21",
+            "end_date": "2025-02-17",
+            "celtic_date": "Janus 2 to Brigid 1",
+            "symbolism": "Protection, healing, and inspiration.",
+            "animal": "Crane - Longevity, wisdom, and spiritual strength.",
+            "element": "🔥 Fire",
+            "mythical_creature": "Dragon - Transformation, growth, and new beginnings.",
+            "url": "https://playgroundofthesenses.substack.com/p/rowan-the-guardian-of-vision-and"
+        },
+        {
+            "name": "Ash",
+            "start_date": "2025-02-18",
+            "end_date": "2025-03-17",
+            "celtic_date": "Brigid 2 to Flora 1",
+            "symbolism": "Strength, determination, and protection.",
+            "animal": "Adder - Transformation and rebirth.",
+            "element": "💧 Water",
+            "mythical_creature": "Sea Serpent - Hidden depths and transformation.",
+            "url": "https://playgroundofthesenses.substack.com/p/ash-the-child-of-water-and-transformation"
+        },
+        {
+            "name": "Alder",
+            "start_date": "2025-03-18",
+            "end_date": "2025-04-14",
+            "celtic_date": "Flora 2 to Maia 1",
+            "symbolism": "Balance, stability, and courage.",
+            "animal": "Fox - Intelligence, cunning, and adaptability.",
+            "element": "🌊 Water",
+            "mythical_creature": "Firebird - Resurrection and spiritual enlightenment.",
+            "url": "https://playgroundofthesenses.substack.com/p/alder-the-flame-of-courage-and-renewal"
+        },
+        {
+            "name": "Willow",
+            "start_date": "2025-04-15",
+            "end_date": "2025-05-12",
+            "celtic_date": "Maia 2 to Juno 1",
+            "symbolism": "Intuition, creativity, and emotions.",
+            "animal": "Hawk - Intuition and sensitivity.",
+            "element": "🌊 Water",
+            "mythical_creature": "Hare - Magic, fertility, and new life.",
+            "url": "https://playgroundofthesenses.substack.com/p/willow-the-dreamer-of-moonlight-and"
+        },
+        {
+            "name": "Hawthorn",
+            "start_date": "2025-05-13",
+            "end_date": "2025-06-09",
+            "celtic_date": "Juno 2 to Solis 1",
+            "symbolism": "Balance, protection, and transformation.",
+            "animal": "Owl - Wisdom, intuition, and mystery.",
+            "element": "🌬️ Air",
+            "mythical_creature": "Unicorn - Purity, grace, and divine guidance.",
+            "url": "https://playgroundofthesenses.substack.com/p/hawthorn-the-hearts-gate-and-wild"
+        },
+        {
+            "name": "Oak",
+            "start_date": "2025-06-10",
+            "end_date": "2025-07-07",
+            "celtic_date": "Solis 2 to Terra 1",
+            "symbolism": "Strength, wisdom, and stability.",
+            "animal": "Wren - Quick-wittedness and resourcefulness.",
+            "element": "🌎 Earth",
+            "mythical_creature": "White Horse - Power, freedom, and victory.",
+            "url": "https://playgroundofthesenses.substack.com/p/oak-the-sovereign-of-strength-and"
+        },
+        {
+            "name": "Holly",
+            "start_date": "2025-07-08",
+            "end_date": "2025-08-04",
+            "celtic_date": "Terra 2 to Lugh 1",
+            "symbolism": "Protection, balance, and transformation.",
+            "animal": "Horse - Freedom, courage, and adventure.",
+            "element": "🔥 Fire",
+            "mythical_creature": "Pegasus - Creativity and spiritual enlightenment.",
+            "url": "https://playgroundofthesenses.substack.com/p/holly-the-warrior-of-heart-and-shadow"
+        },
+        {
+            "name": "Hazel",
+            "start_date": "2025-08-05",
+            "end_date": "2025-09-01",
+            "celtic_date": "Lugh 2 to Pomona 1",
+            "symbolism": "Wisdom, creativity, and inspiration.",
+            "animal": "Salmon - Knowledge and divine inspiration.",
+            "element": "💧 Water",
+            "mythical_creature": "Salmon of Knowledge - Quest for wisdom and understanding.",
+            "url": "https://playgroundofthesenses.substack.com/p/hazel-the-poet-of-wisdom-and-wild"
+        },
+        {
+            "name": "Vine",
+            "start_date": "2025-09-02",
+            "end_date": "2025-09-29",
+            "celtic_date": "Pomona 2 to Autumna 1",
+            "symbolism": "Growth, fun, and celebration.",
+            "animal": "Swan - Grace and transformation.",
+            "element": "🌎 Earth",
+            "mythical_creature": "Selkie - Adaptability and emotional depth.",
+            "url": "https://playgroundofthesenses.substack.com/p/vine-the-enchanter-of-passion-and"
+        },
+        {
+            "name": "Ivy",
+            "start_date": "2025-09-30",
+            "end_date": "2025-10-27",
+            "celtic_date": "Autumna 2 to Eira 1",
+            "symbolism": "Connection, loyalty, and perseverance.",
+            "animal": "Butterfly - Endurance and adaptability.",
+            "element": "🌬️ Air",
+            "mythical_creature": "Faerie - Magic and the hidden realms of nature.",
+            "url": "https://playgroundofthesenses.substack.com/p/ivy-the-weaver-of-devotion-and-endurance"
+        },
+        {
+            "name": "Reed",
+            "start_date": "2025-10-28",
+            "end_date": "2025-11-24",
+            "celtic_date": "Eira 2 to Aether 1",
+            "symbolism": "Adaptability, flexibility, and protection.",
+            "animal": "Cat - Independence and curiosity.",
+            "element": "🌊 Water",
+            "mythical_creature": "Mermaid - Transformation, healing, and rebirth.",
+            "url": "https://playgroundofthesenses.substack.com/p/reed-the-whisperer-between-worlds"
+        },
+        {
+            "name": "Elder",
+            "start_date": "2025-11-25",
+            "end_date": "2025-12-23",
+            "celtic_date": "Aether 2 to Nivis 1",
+            "symbolism": "Protection, renewal, and transformation.",
+            "animal": "Badger - Magic and intelligence.",
+            "element": "🔥 Fire",
+            "mythical_creature": "Phoenix - Rebirth and spiritual transformation.",
+            "url": "https://playgroundofthesenses.substack.com/p/elder-the-flame-that-ends-and-begins"
+        }
+    ]
+}
