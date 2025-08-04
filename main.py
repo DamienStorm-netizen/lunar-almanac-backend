@@ -4,6 +4,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime, date, timedelta
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
@@ -42,6 +43,14 @@ moon_descriptions = {
 }
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Or restrict to your front-end domain
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Mount the directory containing static files
 # app.mount("/celtic_wheel", StaticFiles(directory="celtic_wheel"), name="celtic_wheel")
@@ -700,11 +709,6 @@ def get_events(month: str, day: int):
 
 
 # Remove global custom_events and national_holidays and their try/except loaders.
-
-@app.get("/api/custom-events")
-def get_custom_events():
-    data = load_calendar_data()
-    return data.get("custom_events", [])
 
 @app.get("/api/national-holidays")
 def get_national_holidays():
