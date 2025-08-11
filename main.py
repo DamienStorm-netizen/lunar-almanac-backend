@@ -661,9 +661,6 @@ def compute_celtic_date():
 
     raise HTTPException(status_code=404, detail="Celtic date not found in current range")
 
-if __name__ == "__main__":
-    app.run()
-
 @app.get("/api/lunar-phase")
 def get_dynamic_moon_phase(day: int, month: int, year: int = datetime.now().year):
     try:
