@@ -56,7 +56,7 @@ app.add_middleware(
 # app.mount("/celtic_wheel", StaticFiles(directory="celtic_wheel"), name="celtic_wheel")
 
 # Serve everything in /static under the root path
-app.mount("/static", StaticFiles(directory="static", html=True), name="static")
+app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static"), html=True), name="static")
 
 # Serve the "assets", "css", "js" directories as static files
 # app.mount("/assets", StaticFiles(directory="assets"), name="assets")
@@ -67,7 +67,7 @@ app.mount("/static", StaticFiles(directory="static", html=True), name="static")
 # Optional: serve index.html at the root explicitly
 @app.get("/")
 async def root():
-    return FileResponse(os.path.join("static", "index.html"))
+    return FileResponse(os.path.join(BASE_DIR, "static", "index.html"))
 
 
 # Force browser to load fresh page
@@ -80,6 +80,11 @@ class NoCacheMiddleware(BaseHTTPMiddleware):
         return response
 
 app.add_middleware(NoCacheMiddleware)
+
+# Health endpoint
+@app.get("/healthz")
+def healthz():
+    return {"ok": True}
 
 # Display all 13 months
 @app.get("/calendar")
@@ -103,35 +108,62 @@ def is_leap_year(year):
     return (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0)
 
 
-# Show Moon phases per day (static)
+# Show Moon phases: dynamic with safe fallback
 @app.get("/lunar-phases")
-def get_lunar_phases():
-    return calendar_data["lunar_phases"]
+def get_lunar_phases(start_date: str | None = None, end_date: str | None = None):
+    """If start_date & end_date are provided (YYYY-MM-DD), compute dynamically; otherwise fall back to named full moons."""
+    if start_date and end_date:
+        try:
+            s = datetime.fromisoformat(start_date).date()
+            e = datetime.fromisoformat(end_date).date()
+            return calculate_lunar_phases(s, e)
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail=f"Invalid dates: {exc}")
+    return [
+        {
+            "date": fm["date"],
+            "phase": "Full Moon",
+            "phaseName": fm.get("name", "Full Moon"),
+            "description": fm.get("description", ""),
+            "poem": fm.get("poem", ""),
+            "graphic": "🌕",
+        }
+        for fm in calendar_data.get("full_moons", [])
+    ]
 
 
 # Filter lunar phase by phase, phaseName and date
 @app.get("/lunar-phases/filter")
 def filter_lunar_phases(phase: str = None, phaseName: str = None, start_date: str = None, end_date: str = None):
-    from datetime import datetime
-    
-    # Filtered result
-    filtered_phases = calendar_data["lunar_phases"]
-
-    # Filter by phase
+    if start_date and end_date:
+        try:
+            s = datetime.fromisoformat(start_date).date()
+            e = datetime.fromisoformat(end_date).date()
+            base = calculate_lunar_phases(s, e)
+        except Exception as exc:
+            raise HTTPException(status_code=400, detail=f"Invalid dates: {exc}")
+    else:
+        base = [
+            {
+                "date": fm["date"],
+                "phase": "Full Moon",
+                "phaseName": fm.get("name", "Full Moon"),
+                "description": fm.get("description", ""),
+                "poem": fm.get("poem", ""),
+                "graphic": "🌕",
+            }
+            for fm in calendar_data.get("full_moons", [])
+        ]
+    result = base
     if phase:
-        filtered_phases = [p for p in filtered_phases if p["phase"].lower() == phase.lower()]
-
-    # Filter by phaseName
+        result = [p for p in result if p.get("phase", "").lower() == phase.lower()]
     if phaseName:
-        filtered_phases = [p for p in filtered_phases if p["phaseName"].lower() == phaseName.lower()]
-    
-    # Filter by date range
+        result = [p for p in result if p.get("phaseName", "").lower() == phaseName.lower()]
     if start_date or end_date:
-        start = datetime.fromisoformat(start_date) if start_date else datetime.min
-        end = datetime.fromisoformat(end_date) if end_date else datetime.max
-        filtered_phases = [p for p in filtered_phases if start <= datetime.fromisoformat(p["date"]) <= end]
-    
-    return filtered_phases
+        s = datetime.fromisoformat(start_date).date() if start_date else date.min
+        e = datetime.fromisoformat(end_date).date() if end_date else date.max
+        result = [p for p in result if s <= datetime.fromisoformat(p["date"]).date() <= e]
+    return result
 
 
 # Display list of festivals, filtered by name or month
@@ -189,43 +221,6 @@ def dynamic_moon_phases(start_date: date, end_date: date):
     print("★ dynamic_moon_phases →", phases)   # <-- add
     return phases
 
-def dates_match(date_str1, date_str2):
-
-    start = datetime.fromisoformat(start_date).date()
-    end = datetime.fromisoformat(end_date).date()
-    moon_phases = calculate_lunar_phases(start, end)
-
-    for phase in moon_phases:
-        phase_name = phase["phase"]
-        if phase_name == "Full Moon":
-            # Look up named full moons in calendar_data.json
-            full_moons_list = calendar_data.get("full_moons", [])
-            match = next((fm for fm in full_moons_list if dates_match(fm["date"], phase["date"])), None)
-            if match:
-                phase["moonName"]    = match["name"]
-                phase["description"] = match["description"]
-                phase["poem"]        = match.get("poem", "")
-            else:
-                # Fallback for unnamed full moons
-                phase["moonName"] = "Full Moon"
-                fallback_poems = [
-                    "The moon glows gently this month, unnamed yet full of secrets.",
-                    "A nameless moon rises, wrapped in silver mystery.",
-                    "No name graces this full moon, yet it hums with quiet magic.",
-                    "This moon wears no title, only a cloak of shimmering wonder.",
-                    "A soft and silent full moon drifts through the veil, untethered by name.",
-                    "The full moon of this month remains unnamed, like a forgotten spell in the night sky."
-                ]
-                phase["description"] = moon_descriptions.get("Full Moon", "No description available.")
-                phase["poem"] = random.choice(fallback_poems)
-        else:
-            # Add generic description for other phases
-            phase["moonName"] = None
-            phase["description"] = moon_descriptions.get(phase_name, "No description available.")
-
-    # return moon_phases
-    return datetime.fromisoformat(date_str1).date() == datetime.fromisoformat(date_str2).date() 
-
 #  Extend the /lunar-phases endpoint to include the poem field.
 @app.get("/lunar-phases/poetry")
 def get_lunar_phase_poetry(phase_name: str):
@@ -255,7 +250,7 @@ def get_celtic_year_start(year):
     return celtic_year_start
 
 #Display today's date in the Celtic Calendar
-def compute_celtic_date(gregorian_date):
+def celtic_date_for_gregorian(gregorian_date):
     year = gregorian_date.year
     celtic_year_start = get_celtic_year_start(year)
 
@@ -295,7 +290,7 @@ def compute_celtic_date(gregorian_date):
 @app.get("/celtic-today")
 def celtic_today():
     today = datetime.now().date()
-    celtic_date = compute_celtic_date(today)  # Use the new name here
+    celtic_date = celtic_date_for_gregorian(today)
     return {
         "gregorian_date": today.isoformat(),
         "celtic_month": celtic_date["month"],
@@ -367,7 +362,7 @@ def get_moon_phases(start_date: date, end_date: date):
 
 # Display lunar phases for a specific Celtic month
 @app.get("/calendar/lunar-phases")
-def get_lunar_phases(month_name: str = None):
+def get_lunar_phases_for_celtic_month(month_name: str = None):
     # Get the start and end dates of the Celtic month
     for month in calendar_data["months"]:
         if month["name"].lower() == month_name.lower():
@@ -426,22 +421,15 @@ def add_custom_event(custom_event: dict):
 # ✅ Delete a Custom Event
 @app.delete("/api/custom-events/{id}")
 def delete_custom_event(id: str):
-    global calendar_data  # Ensure we modify the global variable
-
+    global calendar_data
     custom_events = calendar_data.get("custom_events", [])
-    updated_events = [e for e in custom_events if e["id"] != id]
-
+    updated_events = [e for e in custom_events if e.get("id") != id]
     if len(updated_events) < len(custom_events):
-        # Update the calendar data and save
         calendar_data["custom_events"] = updated_events
         save_calendar_data(calendar_data)
-
-        # 💡 **Force reload from JSON (THIS IS THE FIX!)**
-        calendar_data = load_calendar_data()  # 🎩✨ Magic trick to refresh data!
-
-        return {"message": f"Custom event on {date} deleted successfully!"}
-    
-    raise HTTPException(status_code=404, detail=f"No custom event found on {date}.")
+        calendar_data = load_calendar_data()
+        return {"message": f"Custom event {id} deleted successfully!"}
+    raise HTTPException(status_code=404, detail=f"No custom event found with id {id}.")
 
 
 # ✅ Edit an Existing Custom Event
@@ -547,27 +535,55 @@ def get_zodiac_sign_details(sign_name: str):
 @app.get("/notifications")
 def get_upcoming_events(days_ahead: int = 3):
     today = datetime.now().date()
-    upcoming_events = []
-
-    # Combine all events (lunar phases, festivals, custom dates)
-    events = calendar_data["lunar_phases"] + calendar_data["special_days"] + calendar_data.get("custom_dates", [])
-    
-    # Check if events fall within the notification period
-    for event in events:
-        event_date = datetime.fromisoformat(event["date"]).date()
-        days_until = (event_date - today).days
-        if 0 < days_until <= days_ahead:
-            event_name = event.get("phaseName") or event.get("name") or event.get("phase") or "Unknown Event"
-            upcoming_events.append({
-                "name": event_name,
-                "type": event.get("type", "Lunar Phase"),
-                "description": event.get("description", ""),
-                "date": event_date.isoformat(),
-                "days_until": days_until
+    window_end = today + timedelta(days=days_ahead)
+    upcoming = []
+    for ev in calendar_data.get("special_days", []):
+        d = datetime.fromisoformat(ev["date"]).date()
+        if today < d <= window_end:
+            upcoming.append({
+                "name": ev.get("name", "Special Day"),
+                "type": "Festival",
+                "description": ev.get("description", ""),
+                "date": d.isoformat(),
+                "days_until": (d - today).days,
             })
-
-    if upcoming_events:
-        return {"upcoming_events": upcoming_events}
+    for ev in calendar_data.get("custom_events", []):
+        d = datetime.fromisoformat(ev["date"]).date()
+        if today < d <= window_end:
+            upcoming.append({
+                "name": ev.get("title", "Custom Event"),
+                "type": ev.get("type", "Custom Event"),
+                "description": ev.get("notes", ""),
+                "date": d.isoformat(),
+                "days_until": (d - today).days,
+            })
+    for fm in calendar_data.get("full_moons", []):
+        d = datetime.fromisoformat(fm["date"]).date()
+        if today < d <= window_end:
+            upcoming.append({
+                "name": fm.get("name", "Full Moon"),
+                "type": "Lunar Phase",
+                "description": fm.get("description", ""),
+                "date": d.isoformat(),
+                "days_until": (d - today).days,
+            })
+    try:
+        for p in calculate_lunar_phases(today, window_end):
+            if p.get("phase") in {"New Moon", "Full Moon"}:
+                d = datetime.fromisoformat(p["date"]).date()
+                if today < d <= window_end:
+                    upcoming.append({
+                        "name": p.get("phase"),
+                        "type": "Lunar Phase",
+                        "description": p.get("description", ""),
+                        "date": d.isoformat(),
+                        "days_until": (d - today).days,
+                    })
+    except Exception:
+        pass
+    if upcoming:
+        upcoming.sort(key=lambda x: x["date"]) 
+        return {"upcoming_events": upcoming}
     return {"message": "No events in the next few days."}
 
 
@@ -599,7 +615,7 @@ def get_lunar_visuals(month_name: str = None, start_date: str = None, end_date: 
     visuals = []
     for phase in lunar_phases:
         gregorian_date = datetime.fromisoformat(phase["date"]).date()
-        celtic_date = get_celtic_date(gregorian_date)
+        celtic_date = celtic_date_for_gregorian(gregorian_date)
         visuals.append({
             "date": phase["date"],
             "celtic_date": celtic_date,
@@ -614,7 +630,6 @@ def get_lunar_visuals(month_name: str = None, start_date: str = None, end_date: 
     }
 
 # Fetch the moon poem or display a default moon poem
-import random
 
 # List of mystical moon poems
 moon_poems = [
@@ -637,7 +652,7 @@ def get_random_moon_poem():
     return {"poem": random.choice(moon_poems)}
 
 @app.get("/api/celtic-date")
-def compute_celtic_date():
+def get_celtic_date_api():
     celtic_calendar = load_calendar_data()
     if not celtic_calendar:
         raise HTTPException(status_code=500, detail="calendar_data.json not found")
@@ -660,6 +675,7 @@ def compute_celtic_date():
             }
 
     raise HTTPException(status_code=404, detail="Celtic date not found in current range")
+
 
 @app.get("/api/lunar-phase")
 def get_dynamic_moon_phase(day: int, month: int, year: int = datetime.now().year):
