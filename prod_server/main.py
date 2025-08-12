@@ -14,6 +14,8 @@ import os
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+
 # ---------------------------------------------------------------------------
 # Try several fallback locations so the app works in both dev (file in /static)
 # and prod (file copied next to main.py).
@@ -55,19 +57,22 @@ app.add_middleware(
 # Mount the directory containing static files
 # app.mount("/celtic_wheel", StaticFiles(directory="celtic_wheel"), name="celtic_wheel")
 
-# Serve everything in /static under the root path
-app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static"), html=True), name="static")
+if os.path.isdir(STATIC_DIR):
+    app.mount("/static", StaticFiles(directory=STATIC_DIR, html=True), name="static")
+else:
+    print(f"⚠️ Static dir {STATIC_DIR} not found; skipping mount.")
 
 # Serve the "assets", "css", "js" directories as static files
 # app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 # app.mount("/css", StaticFiles(directory="css"), name="css")
 # app.mount("/js", StaticFiles(directory="js"), name="js")
 
-# Route for the main HTML file
-# Optional: serve index.html at the root explicitly
 @app.get("/")
 async def root():
-    return FileResponse(os.path.join(BASE_DIR, "static", "index.html"))
+    index_path = os.path.join(STATIC_DIR, "index.html")
+    if os.path.isfile(index_path):
+        return FileResponse(index_path)
+    return {"ok": True, "service": "lunar-almanac-backend", "static": False}
 
 
 # Force browser to load fresh page
