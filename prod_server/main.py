@@ -46,12 +46,19 @@ moon_descriptions = {
 
 app = FastAPI()
 
+# CORS
+raw = os.environ.get("ALLOWED_ORIGINS", "")
+ALLOWED_ORIGINS = [o.strip() for o in raw.split(",") if o.strip()] or [
+    "http://localhost:5173"  # dev default
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Or restrict to your front-end domain
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    max_age=600,
 )
 
 # Mount the directory containing static files
