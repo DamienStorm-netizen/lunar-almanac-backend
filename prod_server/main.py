@@ -685,30 +685,12 @@ def get_celtic_date_api():
 @app.get("/api/lunar-phase")
 def get_dynamic_moon_phase(day: int, month: int, year: int = datetime.now().year):
     try:
-        # Create a date string
-        date_str = f"{year}-{month:02d}-{day:02d}"
-        
-        # Use ephem to get the moon phase for this date
-        moon_phase = ephem.Moon(date_str).phase
-        
-        # Determine the phase name
-        if 0 <= moon_phase < 7.4:
-            phase_name = "New Moon"
-        elif 7.4 <= moon_phase < 14.8:
-            phase_name = "First Quarter"
-        elif 14.8 <= moon_phase < 22.1:
-            phase_name = "Full Moon"
-        else:
-            phase_name = "Last Quarter"
-
-        return {
-            "date": date_str,
-            "moon_phase": phase_name,
-            "graphic": "🌑🌒🌓🌔🌕🌖🌗🌘"[int(moon_phase // 3.7)]
-        }
-    
+        target = date(year, month, day)
+        result = calculate_lunar_phases(target, target)
+        # calculate_lunar_phases returns a list; for a single day we return the first item
+        return result[0] if result else {"error": "No phase data for that date."}
     except Exception as e:
-        return {"error": str(e)}
+        raise HTTPException(status_code=400, detail=str(e))
 
 @app.get("/api/zodiac")
 def get_zodiac_sign(month: str, day: int):
