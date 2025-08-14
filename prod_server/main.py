@@ -9,6 +9,7 @@ from datetime import datetime, date, timedelta
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 from starlette.requests import Request
+from pathlib import Path
 import random
 import os
 
@@ -102,7 +103,6 @@ def healthz():
 @app.get("/calendar")
 def get_calendar():
     return calendar_data
-
 
 # Display a single month
 @app.get("/calendar/month/{month_name}")
@@ -753,11 +753,107 @@ def estimate_eclipses():
 
     return [lunar_eclipse_event, solar_eclipse_event]
 
+
+
+# -----------------------------
+# Simple storage for custom events (file-backed)
+# -----------------------------
+from pydantic import BaseModel
+from typing import Optional, List
+
+CUSTOM_EVENTS_FILE = os.path.join(BASE_DIR, "custom_events.json")
+
+class CustomEvent(BaseModel):
+    id: str
+    date: str            # "YYYY-MM-DD"
+    title: str
+    type: Optional[str] = None   # e.g. "🔥 Date"
+    notes: Optional[str] = None
+    recurring: bool = False
+
+def _load_custom_events() -> List[dict]:
+    try:
+        with open(CUSTOM_EVENTS_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+    except json.JSONDecodeError:
+        return []
+
+def _save_custom_events(events: List[dict]) -> None:
+    with open(CUSTOM_EVENTS_FILE, "w", encoding="utf-8") as f:
+        json.dump(events, f, ensure_ascii=False, indent=2)
+
+@app.get("/custom-events")
+def get_custom_events():
+    return _load_custom_events()
+
+@app.post("/custom-events")
+def create_custom_event(evt: CustomEvent):
+    events = _load_custom_events()
+    # replace any existing with same id
+    events = [e for e in events if e.get("id") != evt.id]
+    events.append(evt.dict())
+    _save_custom_events(events)
+    return {"ok": True, "saved": evt.id}
+
+@app.put("/custom-events/{date}")
+def update_custom_event(date: str, evt: CustomEvent):
+    events = _load_custom_events()
+    updated = False
+    for i, e in enumerate(events):
+        # Prefer matching by id if present, else by date
+        if (evt.id and e.get("id") == evt.id) or (e.get("date") == date):
+            events[i] = evt.dict()
+            updated = True
+            break
+    if not updated:
+        events.append(evt.dict())
+    _save_custom_events(events)
+    return {"ok": True, "updated": updated}
+
+@app.delete("/custom-events/{date}")
+def delete_custom_event(date: str):
+    events = _load_custom_events()
+    before = len(events)
+    # delete by exact date (and allow query ?id=... if you want to be stricter later)
+    events = [e for e in events if e.get("date") != date]
+    _save_custom_events(events)
+    return {"ok": True, "deleted": before - len(events)}
+
+# -----------------------------
+# Holidays & Eclipse events (stubs)
+# -----------------------------
+HOLIDAYS_FILE = os.path.join(BASE_DIR, "national_holidays.json")
+ECLIPSES_FILE = os.path.join(BASE_DIR, "eclipse_events.json")
+
+def _load_json_or_empty(path: str):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return []
+    except json.JSONDecodeError:
+        return []
+
+@app.get("/national-holidays")
+def national_holidays():
+    # Return contents if file present; else empty list
+    return _load_json_or_empty(HOLIDAYS_FILE)
+
+@app.get("/eclipse-events")
+def eclipse_events():
+    return _load_json_or_empty(ECLIPSES_FILE)
+
+
+
+
 # API Endpoint for Eclipses
 @app.get("/api/eclipse-events")
 def eclipse_events():
     events = estimate_eclipses()
     return events
+
 
 
 @app.get("/api/calendar-data")
@@ -768,3 +864,74 @@ def get_calendar_data():
         return JSONResponse(content=data)
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
+
+# Compatibility alias for dev proxy that may strip the `/api` prefix
+@app.get("/calendar-data", include_in_schema=False)
+def get_calendar_data_alias():
+    return get_calendar_data()
+
+from typing import Optional
+
+def _is_leap_year(y: int) -> bool:
+    return (y % 4 == 0) and (y % 100 != 0 or y % 400 == 0)
+
+def _celtic_month_for(dt: date) -> tuple[str, int]:
+    """
+    Return (month_name, celtic_day) for a Gregorian date using
+    the same boundaries you use in the frontend.
+    """
+    # "Cycle year" matches your JS: dates on/after Dec 23 advance the cycle.
+    cycle = dt.year + 1 if dt >= date(dt.year, 12, 23) else dt.year
+
+    ranges = [
+        ("Nivis",   date(cycle-1, 12, 23), date(cycle,  1, 19)),
+        ("Janus",   date(cycle,   1, 20),  date(cycle,  2, 16)),
+        ("Brigid",  date(cycle,   2, 17),  date(cycle,  3, 16)),
+        ("Flora",   date(cycle,   3, 17),  date(cycle,  4, 13)),
+        ("Maia",    date(cycle,   4, 14),  date(cycle,  5, 11)),
+        ("Juno",    date(cycle,   5, 12),  date(cycle,  6,  8)),
+        ("Solis",   date(cycle,   6,  9),  date(cycle,  7,  6)),
+        ("Terra",   date(cycle,   7,  8),  date(cycle,  8,  4)),
+        ("Lugh",    date(cycle,   8,  4),  date(cycle,  8, 31)),
+        ("Pomona",  date(cycle,   9,  1),  date(cycle,  9, 28)),
+        ("Autumna", date(cycle,   9, 29),  date(cycle, 10, 26)),
+        ("Eira",    date(cycle,  10, 27),  date(cycle, 11, 23)),
+        ("Aether",  date(cycle,  11, 24),  date(cycle, 12, 21)),
+    ]
+
+    # Mirabilis: Dec 22; 2 days iff leap-year (of the cycle), else 1 day.
+    mir_end = 23 if _is_leap_year(cycle) else 22
+    ranges.append(("Mirabilis", date(cycle, 12, 22), date(cycle, 12, mir_end)))
+
+    for name, start, end in ranges:
+        if start <= dt <= end:
+            return name, (dt - start).days + 1
+
+    # Fallback — shouldn't happen with the ranges above.
+    return "Nivis", 1
+
+@app.get("/celtic-date")
+def api_celtic_date(date_str: Optional[str] = None):
+    """
+    Return today's Celtic month/day, or for the supplied ?date=YYYY-MM-DD.
+    """
+    try:
+        target = datetime.strptime(date_str, "%Y-%m-%d").date() if date_str else date.today()
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Bad date; use YYYY-MM-DD")
+
+    month, celtic_day = _celtic_month_for(target)
+    return {"month": month, "celtic_day": celtic_day}
+
+# Simple initial version: returns a pleasant poem; you can wire this
+# to ephem + phase classification later if you want phase-specific lines.
+@app.get("/lunar-phase-poem")
+def api_lunar_phase_poem(date_str: Optional[str] = None):
+    _ = date_str  # reserved for future use
+    poem = (
+        "Moonlight pulls the ocean’s breath,\n"
+        "A rhythm old as life and death.\n"
+        "Under her glow, the tide obeys,\n"
+        "As time drifts on in silver waves."
+    )
+    return {"poem": poem}

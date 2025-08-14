@@ -280,11 +280,34 @@
             "date": "2025-05-06"
         },
         {
-            "id": "1746575894446",
-            "title": "Ride Baby Ride!",
+            "id": "1755037193915",
+            "title": "Let's Rock this Joint!",
             "type": "🎉 Celebrations",
-            "notes": "I'm so excited! 🏍️",
-            "date": "2025-07-16",
+            "date": "2025-08-13",
+            "notes": "Hot hot hot",
+            "recurring": false
+        },
+        {
+            "id": "1755037248781",
+            "title": "Celebrate, Baby!!",
+            "type": "🎉 Celebrations",
+            "notes": "This is a great day to party!",
+            "date": "2025-08-14"
+        },
+        {
+            "id": "1755037248780",
+            "title": "Celebrate, Baby!!",
+            "type": "🎉 Celebrations",
+            "date": "2025-08-14",
+            "notes": "This is a great day to party with passion and spirits!",
+            "recurring": false
+        },
+        {
+            "id": "1755117578487",
+            "title": "xxx",
+            "type": "🔥 Date",
+            "date": "2025-08-14",
+            "notes": "xxx",
             "recurring": false
         }
     ],
@@ -307,7 +330,7 @@
             "description": "Named for the thawing ground and the return of worms, this moon signals the rebirth of the soil as spring approaches.",
             "poem": "Earth stirs beneath the Worm Moon’s gaze,\nRoots awaken, breaking haze.\nLife returns in subtle tune—\nA promise sown beneath the moon."
         },
-       {
+        {
             "name": "Pink Moon",
             "date": "2025-04-13",
             "description": "Named for the blooming pink phlox that herald early spring, this moon celebrates renewal and the first flush of colour after winter.",
