@@ -70,10 +70,6 @@ if os.path.isdir(STATIC_DIR):
 else:
     print(f"⚠️ Static dir {STATIC_DIR} not found; skipping mount.")
 
-@app.get("/health", include_in_schema=False)
-@app.head("/health", include_in_schema=False)
-async def health() -> Response:
-    return Response(content="ok", media_type="text/plain", headers={"Cache-Control": "no-store"})
 
 # Serve the "assets", "css", "js" directories as static files
 # app.mount("/assets", StaticFiles(directory="assets"), name="assets")
@@ -100,10 +96,6 @@ class NoCacheMiddleware(BaseHTTPMiddleware):
 app.add_middleware(NoCacheMiddleware)
 
 # Health endpoint
-@app.get("/healthz")
-def healthz():
-    return {"ok": True}
-
 @app.get("/health", include_in_schema=False)
 @app.head("/health", include_in_schema=False)
 async def health() -> Response:
