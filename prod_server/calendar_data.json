@@ -255,6 +255,12 @@
             "type": "USA",
             "date": "2025-12-25",
             "description": "A holy hush cloaks the world in wonder, where light returns through stories, stars, and song."
+        },
+        {
+            "title": "New Year's Eve",
+            "type": "USA",
+            "date": "2025-12-31",
+            "description": "The last spark of the year, a collective inhale before the wheel turns anew."
         }
     ],
     "custom_events": [
