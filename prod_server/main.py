@@ -1,15 +1,12 @@
 import json
 import ephem
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Response, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime, date, timedelta
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import Response
-from starlette.requests import Request
-from pathlib import Path
 import random
 import os
 
@@ -94,6 +91,10 @@ class NoCacheMiddleware(BaseHTTPMiddleware):
         return response
 
 app.add_middleware(NoCacheMiddleware)
+
+@app.head("/", include_in_schema=False)
+async def root_head():
+    return Response(status_code=200, media_type="text/plain")
 
 # Health endpoint
 @app.get("/health", include_in_schema=False)
@@ -304,11 +305,11 @@ def celtic_date_for_gregorian(gregorian_date):
 @app.get("/celtic-today")
 def celtic_today():
     today = datetime.now().date()
-    celtic_date = celtic_date_for_gregorian(today)
+    month, cday = _celtic_month_for(today)
     return {
         "gregorian_date": today.isoformat(),
-        "celtic_month": celtic_date["month"],
-        "celtic_day": celtic_date["day"]
+        "celtic_month": month,
+        "celtic_day": cday,
     }
 
 
@@ -406,59 +407,6 @@ def save_calendar_data(data):
 # Load data initially
 calendar_data = load_calendar_data()
 
-@app.get("/api/custom-events")
-async def get_custom_events():
-    data = load_calendar_data()
-    return data.get("custom_events", [])
-
-# ✅ Add a New Custom Event
-@app.post("/api/custom-events")
-def add_custom_event(custom_event: dict):
-    required_fields = ["title", "date"]
-    
-    # Ensure required fields are present
-    if not all(field in custom_event for field in required_fields):
-        raise HTTPException(status_code=400, detail="Missing required fields: title, date")
-
-    # Default optional fields if missing
-    custom_event.setdefault("type", "General")
-    custom_event.setdefault("notes", "")
-
-    calendar_data.setdefault("custom_events", []).append(custom_event)
-    save_calendar_data(calendar_data)
-
-    return {
-        "message": "Custom event added successfully!",
-        "event": custom_event
-    }
-
-# ✅ Delete a Custom Event
-@app.delete("/api/custom-events/{id}")
-def delete_custom_event(id: str):
-    global calendar_data
-    custom_events = calendar_data.get("custom_events", [])
-    updated_events = [e for e in custom_events if e.get("id") != id]
-    if len(updated_events) < len(custom_events):
-        calendar_data["custom_events"] = updated_events
-        save_calendar_data(calendar_data)
-        calendar_data = load_calendar_data()
-        return {"message": f"Custom event {id} deleted successfully!"}
-    raise HTTPException(status_code=404, detail=f"No custom event found with id {id}.")
-
-
-# ✅ Edit an Existing Custom Event
-@app.put("/api/custom-events/{id}")
-def edit_custom_event(id: str, updated_data: dict):
-    custom_events = calendar_data.get("custom_events", [])
-
-    for event in custom_events:
-        if event["id"] == id:
-            event.update(updated_data)
-            save_calendar_data(calendar_data)
-            return {"message": f"Custom event on {id} updated successfully!", "event": event}
-    
-    raise HTTPException(status_code=404, detail=f"No custom event found on {id}.")
-
 
 # Retrieve the Celtic Zodiac sign for a specific date
 @app.get("/zodiac")
@@ -551,17 +499,7 @@ def get_upcoming_events(days_ahead: int = 3):
     today = datetime.now().date()
     window_end = today + timedelta(days=days_ahead)
     upcoming = []
-    for ev in calendar_data.get("special_days", []):
-        d = datetime.fromisoformat(ev["date"]).date()
-        if today < d <= window_end:
-            upcoming.append({
-                "name": ev.get("name", "Special Day"),
-                "type": "Festival",
-                "description": ev.get("description", ""),
-                "date": d.isoformat(),
-                "days_until": (d - today).days,
-            })
-    for ev in calendar_data.get("custom_events", []):
+    for ev in _load_custom_events():
         d = datetime.fromisoformat(ev["date"]).date()
         if today < d <= window_end:
             upcoming.append({
@@ -760,68 +698,99 @@ def estimate_eclipses():
 # -----------------------------
 # Simple storage for custom events (file-backed)
 # -----------------------------
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import Optional, List
+import uuid
 
 CUSTOM_EVENTS_FILE = os.path.join(BASE_DIR, "custom_events.json")
 
 class CustomEvent(BaseModel):
-    id: str
-    date: str            # "YYYY-MM-DD"
+    id: Optional[str] = None
+    date: str              # "YYYY-MM-DD"
     title: str
-    type: Optional[str] = None   # e.g. "🔥 Date"
+    type: Optional[str] = None
     notes: Optional[str] = None
     recurring: bool = False
+
+    @field_validator("date")
+    @classmethod
+    def date_must_be_iso(cls, v):
+        import re
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", v or ""):
+            raise ValueError("date must be YYYY-MM-DD")
+        return v
 
 def _load_custom_events() -> List[dict]:
     try:
         with open(CUSTOM_EVENTS_FILE, "r", encoding="utf-8") as f:
             return json.load(f)
-    except FileNotFoundError:
+    except (FileNotFoundError, json.JSONDecodeError):
         return []
-    except json.JSONDecodeError:
-        return []
+
+def _atomic_write_json(path: str, data) -> None:
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    os.replace(tmp, path)
 
 def _save_custom_events(events: List[dict]) -> None:
-    with open(CUSTOM_EVENTS_FILE, "w", encoding="utf-8") as f:
-        json.dump(events, f, ensure_ascii=False, indent=2)
+    _atomic_write_json(CUSTOM_EVENTS_FILE, events)
+
 
 @app.get("/custom-events")
-def get_custom_events():
-    return _load_custom_events()
+def list_custom_events():
+    # optional: sort by date then title
+    events = _load_custom_events()
+    events.sort(key=lambda e: (e.get("date",""), e.get("title","")))
+    return events
 
-@app.post("/custom-events")
+@app.post("/custom-events", status_code=201)
 def create_custom_event(evt: CustomEvent):
     events = _load_custom_events()
+    evt.id = evt.id or str(uuid.uuid4())
     # replace any existing with same id
     events = [e for e in events if e.get("id") != evt.id]
-    events.append(evt.dict())
+    events.append(evt.model_dump())
     _save_custom_events(events)
-    return {"ok": True, "saved": evt.id}
+    return {"ok": True, "id": evt.id}
 
-@app.put("/custom-events/{date}")
-def update_custom_event(date: str, evt: CustomEvent):
+@app.put("/custom-events/{id}")
+def update_custom_event(id: str, evt: CustomEvent):
     events = _load_custom_events()
-    updated = False
     for i, e in enumerate(events):
-        # Prefer matching by id if present, else by date
-        if (evt.id and e.get("id") == evt.id) or (e.get("date") == date):
-            events[i] = evt.dict()
-            updated = True
-            break
-    if not updated:
-        events.append(evt.dict())
-    _save_custom_events(events)
-    return {"ok": True, "updated": updated}
+        if e.get("id") == id:
+            # keep the path id authoritative
+            payload = evt.model_dump()
+            payload["id"] = id
+            events[i] = payload
+            _save_custom_events(events)
+            return {"ok": True, "updated": True}
+    raise HTTPException(status_code=404, detail=f"No event with id {id}")
 
-@app.delete("/custom-events/{date}")
-def delete_custom_event(date: str):
+@app.delete("/custom-events/{id}", status_code=204)
+def delete_custom_event(id: str):
     events = _load_custom_events()
-    before = len(events)
-    # delete by exact date (and allow query ?id=... if you want to be stricter later)
-    events = [e for e in events if e.get("date") != date]
-    _save_custom_events(events)
-    return {"ok": True, "deleted": before - len(events)}
+    new_events = [e for e in events if e.get("id") != id]
+    if len(new_events) == len(events):
+        raise HTTPException(status_code=404, detail=f"No event with id {id}")
+    _save_custom_events(new_events)
+    return
+
+@app.get("/api/custom-events")
+def api_list_custom_events():
+    return list_custom_events()
+
+@app.post("/api/custom-events", status_code=201)
+def api_create_custom_event(evt: CustomEvent):
+    return create_custom_event(evt)
+
+@app.put("/api/custom-events/{id}")
+def api_update_custom_event(id: str, evt: CustomEvent):
+    return update_custom_event(id, evt)
+
+@app.delete("/api/custom-events/{id}", status_code=204)
+def api_delete_custom_event(id: str):
+    return delete_custom_event(id)
 
 # -----------------------------
 # Holidays & Eclipse events (stubs)
@@ -844,15 +813,13 @@ def national_holidays():
     return _load_json_or_empty(HOLIDAYS_FILE)
 
 @app.get("/eclipse-events")
-def eclipse_events():
+def eclipse_events_file():
     return _load_json_or_empty(ECLIPSES_FILE)
-
-
 
 
 # API Endpoint for Eclipses
 @app.get("/api/eclipse-events")
-def eclipse_events():
+def api_eclipse_events():
     events = estimate_eclipses()
     return events
 
@@ -871,8 +838,6 @@ def get_calendar_data():
 @app.get("/calendar-data", include_in_schema=False)
 def get_calendar_data_alias():
     return get_calendar_data()
-
-from typing import Optional
 
 def _is_leap_year(y: int) -> bool:
     return (y % 4 == 0) and (y % 100 != 0 or y % 400 == 0)

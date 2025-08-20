@@ -1,2 +1,39 @@
+# Python bytecode / caches
 __pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pytype/
+.hypothesis/
+.coverage*
+htmlcov/
+
+# Virtual envs / Python tooling
 venv/
+.venv/
+.python-version
+.env
+.env.*
+
+# Packaging/build artifacts
+build/
+dist/
+*.egg-info/
+
+# Logs & misc
+logs/
+*.log
+.cache/
+
+# OS/editor junk
+.DS_Store
+.vscode/
+.idea/
+
+# App runtime data (user-generated)
+custom_events.json
+# If these are generated rather than curated, uncomment:
+# national_holidays.json
+# eclipse_events.json

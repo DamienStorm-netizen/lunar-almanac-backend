@@ -263,60 +263,6 @@
             "description": "The last spark of the year, a collective inhale before the wheel turns anew."
         }
     ],
-    "custom_events": [
-        {
-            "id": "1711742214032",
-            "title": "Hello World, BabySweet",
-            "type": "💜 Romantic",
-            "date": "2025-05-02",
-            "notes": "Baby is the best!!"
-        },
-        {
-            "id": "1744328456472",
-            "title": "Hello World, Baby Baby!",
-            "type": "🔥 Date",
-            "date": "2025-04-12",
-            "notes": "You took too much, too much...."
-        },
-        {
-            "id": "1746485879844",
-            "title": "Hello World, Baby Princess",
-            "type": "🔥 Date",
-            "notes": "Date test!",
-            "date": "2025-05-06"
-        },
-        {
-            "id": "1755037193915",
-            "title": "Let's Rock this Joint!",
-            "type": "🎉 Celebrations",
-            "date": "2025-08-13",
-            "notes": "Hot hot hot",
-            "recurring": false
-        },
-        {
-            "id": "1755037248781",
-            "title": "Celebrate, Baby!!",
-            "type": "🎉 Celebrations",
-            "notes": "This is a great day to party!",
-            "date": "2025-08-14"
-        },
-        {
-            "id": "1755037248780",
-            "title": "Celebrate, Baby!!",
-            "type": "🎉 Celebrations",
-            "date": "2025-08-14",
-            "notes": "This is a great day to party with passion and spirits!",
-            "recurring": false
-        },
-        {
-            "id": "1755117578487",
-            "title": "xxx",
-            "type": "🔥 Date",
-            "date": "2025-08-14",
-            "notes": "xxx",
-            "recurring": false
-        }
-    ],
     "full_moons": [
         {
             "name": "Wolf Moon",
