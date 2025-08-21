@@ -654,9 +654,110 @@ def get_events(month: str, day: int):
     return {"message": "No events found."}
 
 
+# ------------------------------------------------------------
+# Compatibility aliases for legacy /api/custom-events endpoints
+# These delegate to the file-backed helpers _load_custom_events
+# and _save_custom_events so the frontend can keep calling:
+#   GET/POST   /api/custom-events
+#   PUT/DELETE /api/custom-events/{id_or_date}
+# where {id_or_date} may be an event id, YYYY-MM-DD date, or
+# a composite key "YYYY-MM-DD|Title".
+# ------------------------------------------------------------
+
+@app.get("/api/custom-events")
+def api_custom_events_list():
+    try:
+        return _load_custom_events()
+    except NameError:
+        return load_calendar_data().get("custom_events", [])
+
+@app.post("/api/custom-events")
+def api_custom_events_create(evt: dict):
+    try:
+        events = _load_custom_events()
+        save = _save_custom_events
+    except NameError:
+        data = load_calendar_data()
+        events = data.get("custom_events", [])
+        def save(evts):
+            data["custom_events"] = evts
+            save_calendar_data(data)
+
+    # ensure id
+    if not evt.get("id"):
+        evt["id"] = str(int(datetime.now().timestamp() * 1000))
+
+    # de-dupe by id or (date|title)
+    title = evt.get("title") or evt.get("name") or ""
+    key = f"{evt.get('date')}|{title}"
+    def _same(e):
+        t = e.get("title") or e.get("name") or ""
+        return (str(e.get("id")) == str(evt["id"])) or (f"{e.get('date')}|{t}" == key)
+
+    events = [e for e in events if not _same(e)]
+    events.append(evt)
+    save(events)
+    return {"ok": True, "saved": evt["id"], "event": evt}
+
+@app.put("/api/custom-events/{id}")
+def api_custom_events_update(id: str, updated: dict):
+    try:
+        events = _load_custom_events()
+        save = _save_custom_events
+    except NameError:
+        data = load_calendar_data()
+        events = data.get("custom_events", [])
+        def save(evts):
+            data["custom_events"] = evts
+            save_calendar_data(data)
+
+    updated_flag = False
+    for i, e in enumerate(events):
+        title = e.get("title") or e.get("name") or ""
+        composite = f"{e.get('date')}|{title}"
+        if str(e.get("id")) == id or e.get("date") == id or composite == id:
+            merged = {**e, **updated}
+            if not merged.get("id"):
+                merged["id"] = e.get("id") or id
+            events[i] = merged
+            updated_flag = True
+            break
+
+    if not updated_flag:
+        updated = {**updated}
+        updated.setdefault("id", id)
+        events.append(updated)
+
+    save(events)
+    return {"ok": True, "updated": updated_flag}
+
+@app.delete("/api/custom-events/{id}")
+def api_custom_events_delete(id: str):
+    try:
+        events = _load_custom_events()
+        save = _save_custom_events
+    except NameError:
+        data = load_calendar_data()
+        events = data.get("custom_events", [])
+        def save(evts):
+            data["custom_events"] = evts
+            save_calendar_data(data)
+
+    before = len(events)
+
+    def _matches(e):
+        title = e.get("title") or e.get("name") or ""
+        return (
+            str(e.get("id")) == id
+            or e.get("date") == id
+            or f"{e.get('date')}|{title}" == id
+        )
+
+    events = [e for e in events if not _matches(e)]
+    save(events)
+    return {"ok": True, "deleted": before - len(events)}
 
 # Remove global custom_events and national_holidays and their try/except loaders.
-
 @app.get("/api/national-holidays")
 def get_national_holidays():
     data = load_calendar_data()
